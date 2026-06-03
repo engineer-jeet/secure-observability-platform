@@ -1,0 +1,13 @@
+{
+  "name": "payment-service",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "axios": "^1.8.0",
+    "express": "^4.21.2",
+    "@opentelemetry/api": "latest",
+    "@opentelemetry/sdk-node": "latest",
+    "@opentelemetry/exporter-trace-otlp-grpc": "latest",
+    "@opentelemetry/auto-instrumentations-node": "latest"
+  }
+}
