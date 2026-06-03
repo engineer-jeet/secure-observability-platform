@@ -1,36 +1,83 @@
 # Python
+
 venv/
+
 .venv/
+
 __pycache__/
+
 *.pyc
 
+.pytest_cache/
+
 # Terraform
+
 .terraform/
+
 *.tfstate
+
 *.tfstate.*
+
 crash.log
 
+terraform.tfvars
+
+terraform.tfvars.json
+
 # macOS
+
 .DS_Store
 
 # IDE
+
 .vscode/
+
 .idea/
 
 # Logs
+
 *.log
 
 # OpenSearch
+
 opensearch-data/
 
 # Node.js
+
 node_modules/
 
+npm-debug.log*
+
 # Java
+
 target/
 
+*.class
+
 # Go
+
 bin/
 
+coverage.out
+
 # Docker
+
 *.tar
+
+# Kubernetes secrets
+
+*.secret.yaml
+
+secret.yaml
+
+# Env files
+
+.env
+
+.env.*
+
+# Build artifacts
+
+dist/
+
+build/
