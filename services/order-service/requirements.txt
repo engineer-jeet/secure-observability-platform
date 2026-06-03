@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+opentelemetry-sdk
+opentelemetry-api
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation

@@ -1,0 +1,36 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OpenSearch
+opensearch-data/
+
+# Node.js
+node_modules/
+
+# Java
+target/
+
+# Go
+bin/
+
+# Docker
+*.tar

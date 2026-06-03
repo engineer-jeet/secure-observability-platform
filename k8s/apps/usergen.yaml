@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: usergen
+  namespace: apps
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: usergen
+
+  template:
+    metadata:
+      labels:
+        app: usergen
+
+    spec:
+      containers:
+
+      - name: usergen
+
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+        imagePullPolicy: IfNotPresent
+
+        args:
+          - traces
+          - --otlp-endpoint=gateway-collector.observability.svc.cluster.local:4317
+          - --otlp-insecure
+          - --duration=inf
+          - --rate=5
+          - --service=user-service
+          - --telemetry-attributes=customer.email="jeet@example.com"
+          - --telemetry-attributes=credit_card="4111111111111111"
+          - --telemetry-attributes=password="supersecret"
+          - --telemetry-attributes=cloud.region="eu-west-1"
