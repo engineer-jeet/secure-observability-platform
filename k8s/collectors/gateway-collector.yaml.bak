@@ -1,0 +1,142 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+
+metadata:
+  name: gateway
+  namespace: observability
+
+spec:
+
+  mode: deployment
+  replicas: 2
+
+  image: otel/opentelemetry-collector-contrib:latest
+
+  config:
+
+    receivers:
+
+      otlp:
+        protocols:
+
+          grpc:
+            endpoint: 0.0.0.0:4317
+
+          http:
+            endpoint: 0.0.0.0:4318
+
+    processors:
+
+      attributes:
+
+        actions:
+
+          - key: customer.email
+            action: upsert
+            value: REDACTED
+
+          - key: credit_card
+            action: upsert
+            value: MASKED
+
+          - key: password
+            action: delete
+
+      batch: {}
+
+    connectors:
+
+      routing:
+
+        default_pipelines:
+          - traces/payment
+
+        table:
+
+          - context: resource
+            condition: 'attributes["service.name"] == "payment-service"'
+
+            pipelines:
+              - traces/payment
+
+          - context: resource
+            condition: 'attributes["service.name"] == "user-service"'
+
+            pipelines:
+              - traces/user
+
+    extensions:
+
+      basicauth/payment:
+        client_auth:
+          username: admin
+          password: CHANGE_ME
+
+      basicauth/user:
+        client_auth:
+          username: admin
+          password: CHANGE_ME
+
+    exporters:
+
+      opensearch/payment:
+
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+
+          tls:
+            insecure_skip_verify: true
+
+          auth:
+            authenticator: basicauth/payment
+
+        logs_index: traces-payment
+
+      opensearch/user:
+
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+
+          tls:
+            insecure_skip_verify: true
+
+          auth:
+            authenticator: basicauth/user
+
+        logs_index: traces-user
+
+    service:
+
+      extensions:
+        - basicauth/payment
+        - basicauth/user
+
+      pipelines:
+
+        traces:
+
+          receivers:
+            - otlp
+
+          processors:
+            - attributes
+            - batch
+
+          exporters:
+            - routing
+
+        traces/payment:
+
+          receivers:
+            - routing
+
+          exporters:
+            - opensearch/payment
+
+        traces/user:
+
+          receivers:
+            - routing
+
+          exporters:
+            - opensearch/user
