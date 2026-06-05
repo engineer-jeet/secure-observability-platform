@@ -18,19 +18,15 @@ spec:
 
       otlp:
         protocols:
-
           grpc:
             endpoint: 0.0.0.0:4317
-
           http:
             endpoint: 0.0.0.0:4318
 
     processors:
 
       attributes:
-
         actions:
-
           - key: customer.email
             action: upsert
             value: REDACTED
@@ -47,96 +43,246 @@ spec:
     connectors:
 
       routing:
-
         default_pipelines:
           - traces/payment
 
         table:
-
           - context: resource
             condition: 'attributes["service.name"] == "payment-service"'
-
-            pipelines:
-              - traces/payment
+            pipelines: [traces/payment, logs/payment]
 
           - context: resource
             condition: 'attributes["service.name"] == "user-service"'
+            pipelines: [traces/user, logs/user]
 
-            pipelines:
-              - traces/user
+          - context: resource
+            condition: 'attributes["service.name"] == "order-service"'
+            pipelines: [traces/order, logs/order]
+
+          - context: resource
+            condition: 'attributes["service.name"] == "inventory-service"'
+            pipelines: [traces/inventory, logs/inventory]
+
+          - context: resource
+            condition: 'attributes["service.name"] == "notification-service"'
+            pipelines: [traces/notification, logs/notification]
+
+          - context: resource
+            condition: 'attributes["service.name"] == "checkout-service"'
+            pipelines: [traces/checkout, logs/checkout]
 
     extensions:
 
       basicauth/payment:
         client_auth:
           username: admin
-          password: CHANGE_ME
+          password: Obs3rv@bility!2026
 
       basicauth/user:
         client_auth:
           username: admin
-          password: CHANGE_ME
+          password: Obs3rv@bility!2026
+
+      basicauth/order:
+        client_auth:
+          username: admin
+          password: Obs3rv@bility!2026
+
+      basicauth/inventory:
+        client_auth:
+          username: admin
+          password: Obs3rv@bility!2026
+
+      basicauth/notification:
+        client_auth:
+          username: admin
+          password: Obs3rv@bility!2026
+
+      basicauth/checkout:
+        client_auth:
+          username: admin
+          password: Obs3rv@bility!2026
 
     exporters:
 
+      # -------- TRACES --------
       opensearch/payment:
-
         http:
           endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
-
           tls:
             insecure_skip_verify: true
-
           auth:
             authenticator: basicauth/payment
-
         logs_index: traces-payment
 
       opensearch/user:
-
         http:
           endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
-
           tls:
             insecure_skip_verify: true
-
           auth:
             authenticator: basicauth/user
-
         logs_index: traces-user
+
+      opensearch/order:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/order
+        logs_index: traces-order
+
+      opensearch/inventory:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/inventory
+        logs_index: traces-inventory
+
+      opensearch/notification:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/notification
+        logs_index: traces-notification
+
+      opensearch/checkout:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/checkout
+        logs_index: traces-checkout
+
+      # -------- LOGS (NEW INDEXES) --------
+      opensearch-logs/payment:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/payment
+        logs_index: logs-payment
+
+      opensearch-logs/user:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/user
+        logs_index: logs-user
+
+      opensearch-logs/order:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/order
+        logs_index: logs-order
+
+      opensearch-logs/inventory:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/inventory
+        logs_index: logs-inventory
+
+      opensearch-logs/notification:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/notification
+        logs_index: logs-notification
+
+      opensearch-logs/checkout:
+        http:
+          endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+          tls:
+            insecure_skip_verify: true
+          auth:
+            authenticator: basicauth/checkout
+        logs_index: logs-checkout
 
     service:
 
       extensions:
         - basicauth/payment
         - basicauth/user
+        - basicauth/order
+        - basicauth/inventory
+        - basicauth/notification
+        - basicauth/checkout
 
       pipelines:
 
+        # ---------------- TRACES ----------------
         traces:
-
-          receivers:
-            - otlp
-
-          processors:
-            - attributes
-            - batch
-
-          exporters:
-            - routing
+          receivers: [otlp]
+          processors: [attributes, batch]
+          exporters: [routing]
 
         traces/payment:
-
-          receivers:
-            - routing
-
-          exporters:
-            - opensearch/payment
+          receivers: [routing]
+          exporters: [opensearch/payment]
 
         traces/user:
+          receivers: [routing]
+          exporters: [opensearch/user]
 
-          receivers:
-            - routing
+        traces/order:
+          receivers: [routing]
+          exporters: [opensearch/order]
 
-          exporters:
-            - opensearch/user
+        traces/inventory:
+          receivers: [routing]
+          exporters: [opensearch/inventory]
+
+        traces/notification:
+          receivers: [routing]
+          exporters: [opensearch/notification]
+
+        traces/checkout:
+          receivers: [routing]
+          exporters: [opensearch/checkout]
+
+        # ---------------- LOGS ----------------
+        logs:
+          receivers: [otlp]
+          processors: [attributes, batch]
+          exporters: [routing]
+
+        logs/payment:
+          receivers: [routing]
+          exporters: [opensearch-logs/payment]
+
+        logs/user:
+          receivers: [routing]
+          exporters: [opensearch-logs/user]
+
+        logs/order:
+          receivers: [routing]
+          exporters: [opensearch-logs/order]
+
+        logs/inventory:
+          receivers: [routing]
+          exporters: [opensearch-logs/inventory]
+
+        logs/notification:
+          receivers: [routing]
+          exporters: [opensearch-logs/notification]
+
+        logs/checkout:
+          receivers: [routing]
+          exporters: [opensearch-logs/checkout]

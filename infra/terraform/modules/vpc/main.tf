@@ -26,7 +26,9 @@ resource "aws_subnet" "public_1" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.region_name}-public-1"
+    Name                                        = "${var.region_name}-public-1"
+    "kubernetes.io/role/elb"                    = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -38,7 +40,9 @@ resource "aws_subnet" "public_2" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.region_name}-public-2"
+    Name                                        = "${var.region_name}-public-2"
+    "kubernetes.io/role/elb"                    = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -49,7 +53,9 @@ resource "aws_subnet" "private_1" {
   availability_zone = "${var.region_name}a"
 
   tags = {
-    Name = "${var.region_name}-private-1"
+    Name                                        = "${var.region_name}-private-1"
+    "kubernetes.io/role/internal-elb"           = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -60,7 +66,9 @@ resource "aws_subnet" "private_2" {
   availability_zone = "${var.region_name}b"
 
   tags = {
-    Name = "${var.region_name}-private-2"
+    Name                                        = "${var.region_name}-private-2"
+    "kubernetes.io/role/internal-elb"           = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -87,16 +95,13 @@ resource "aws_nat_gateway" "this" {
   }
 }
 
+#
+# Route Tables
+#
+
 resource "aws_route_table" "public" {
 
   vpc_id = aws_vpc.this.id
-
-  route {
-
-    cidr_block = "0.0.0.0/0"
-
-    gateway_id = aws_internet_gateway.this.id
-  }
 
   tags = {
     Name = "${var.region_name}-public-rt"
@@ -107,17 +112,36 @@ resource "aws_route_table" "private" {
 
   vpc_id = aws_vpc.this.id
 
-  route {
-
-    cidr_block = "0.0.0.0/0"
-
-    nat_gateway_id = aws_nat_gateway.this.id
-  }
-
   tags = {
     Name = "${var.region_name}-private-rt"
   }
 }
+
+#
+# Routes
+#
+
+resource "aws_route" "public_internet" {
+
+  route_table_id = aws_route_table.public.id
+
+  destination_cidr_block = "0.0.0.0/0"
+
+  gateway_id = aws_internet_gateway.this.id
+}
+
+resource "aws_route" "private_nat" {
+
+  route_table_id = aws_route_table.private.id
+
+  destination_cidr_block = "0.0.0.0/0"
+
+  nat_gateway_id = aws_nat_gateway.this.id
+}
+
+#
+# Route Table Associations
+#
 
 resource "aws_route_table_association" "public_1" {
 

@@ -2,6 +2,8 @@ module "us_vpc" {
 
   source = "./modules/vpc"
 
+  cluster_name = "us-observability-cluster"
+
   region_name = "us-east-1"
 
   vpc_cidr = "10.0.0.0/16"
@@ -20,6 +22,8 @@ module "eu_vpc" {
   providers = {
     aws = aws.eu
   }
+
+  cluster_name = "eu-observability-cluster"
 
   region_name = "eu-west-1"
 
@@ -40,6 +44,8 @@ module "apac_vpc" {
     aws = aws.apac
   }
 
+  cluster_name = "apac-observability-cluster"
+
   region_name = "ap-south-1"
 
   vpc_cidr = "10.2.0.0/16"
@@ -58,4 +64,30 @@ module "us_eks" {
   cluster_name = "us-observability-cluster"
 
   private_subnets = module.us_vpc.private_subnets
+}
+
+module "eu_eks" {
+
+  source = "./modules/eks"
+
+  providers = {
+    aws = aws.eu
+  }
+
+  cluster_name = "eu-observability-cluster"
+
+  private_subnets = module.eu_vpc.private_subnets
+}
+
+module "apac_eks" {
+
+  source = "./modules/eks"
+
+  providers = {
+    aws = aws.apac
+  }
+
+  cluster_name = "apac-observability-cluster"
+
+  private_subnets = module.apac_vpc.private_subnets
 }
