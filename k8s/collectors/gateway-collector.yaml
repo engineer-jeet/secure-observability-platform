@@ -88,32 +88,32 @@ spec:
       basicauth/payment:
         client_auth:
           username: admin
-          password: Obs3rv@bility!2026
+          password: ${OPENSEARCH_PASSWORD}
 
       basicauth/user:
         client_auth:
           username: admin
-          password: Obs3rv@bility!2026
+          password: ${OPENSEARCH_PASSWORD}
 
       basicauth/order:
         client_auth:
           username: admin
-          password: Obs3rv@bility!2026
+          password: ${OPENSEARCH_PASSWORD}
 
       basicauth/inventory:
         client_auth:
           username: admin
-          password: Obs3rv@bility!2026
+          password: ${OPENSEARCH_PASSWORD}
 
       basicauth/notification:
         client_auth:
           username: admin
-          password: Obs3rv@bility!2026
+          password: ${OPENSEARCH_PASSWORD}
 
       basicauth/checkout:
         client_auth:
           username: admin
-          password: Obs3rv@bility!2026
+          password: ${OPENSEARCH_PASSWORD}
 
     exporters:
 
