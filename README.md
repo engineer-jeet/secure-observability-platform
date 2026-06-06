@@ -154,3 +154,6 @@ Future Enhancements
 * Alerting layer for anomaly detection
 
 
+## Multi-Service Telemetry Distribution
+This view helps validate routing logic in the OpenTelemetry Collector.
+![Service Traffic Dashboard](docs/images/service-traffic-dashboard.png)
